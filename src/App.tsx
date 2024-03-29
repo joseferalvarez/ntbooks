@@ -4,11 +4,13 @@ import { searchBook, trendingBooks } from "./functions/searchBook";
 import Book from "./components/Book";
 import Search from "./components/Search";
 import Logo from "./components/Logo";
+import Popup from "./components/Popup";
 
 export default function App() {
 
   const [books, setBooks] = useState<IBook[]>();
   const [search, setSearch] = useState<string>();
+  const [currentBook, setCurrentBook] = useState<IBook | null>(null);
   const [event, setEvent] = useState(null);
 
   useEffect(() => {
@@ -21,7 +23,7 @@ export default function App() {
    
     const newEvent = setTimeout(() => {
       getBooks(search);
-    }, 500);
+    }, 1500);
 
     setEvent(newEvent);
   }, [search]);
@@ -65,9 +67,14 @@ export default function App() {
           <Search setSearch={setSearch} />
         </div>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] auto-rows-auto gap-[15px] w-[100%] px-[75px] pt-[120px] pb-[40px]">
-          {books && books.length > 1 && books.map((book: IBook) => (<Book key={book.cover_i} book={getBookData(book)}/>))}
+          {books && books.length > 1 && books.map((book: IBook) => (<Book key={book.cover_i} book={getBookData(book)} setCurrentBook={setCurrentBook}/>))}
         </div>
       </div>
+      {currentBook && 
+        <Popup 
+          currentBook={currentBook} 
+          setCurrentBook={setCurrentBook}
+        />}
     </div>
   )
 }
