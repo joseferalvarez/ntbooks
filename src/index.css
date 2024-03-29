@@ -1,3 +1,41 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+    font-family: 'Geist';
+    src: url(/fonts/Geist-Regular.woff2);
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Geist';
+    src: url(/fonts/GeistVF.ttf);
+}
+@font-face {
+    font-family: 'Geist';
+    src: url(/fonts/GeistVF.woff2);
+}
+
+html{
+    font-family: 'Geist';
+    color: #2C282C;
+}
+
+.book-title{
+    font-weight: 500;
+    font-size: 1.1rem;
+    line-height: 1.1;
+}
+.book-author{
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+.book-publisher{
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+.book-data{
+    font-weight: 500;
+    font-size: 0.8rem;
+}

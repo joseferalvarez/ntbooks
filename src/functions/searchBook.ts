@@ -3,5 +3,10 @@ const searchBook = async (title: string) => {
     const data = await response.json();
     return data;
 }
+const trendingBooks = async() => {
+    const response = await fetch(import.meta.env.VITE_OPEN_LIBRARY_TRENDING);
+    const data = await response.json();
+    return data;
+}
 
-export {searchBook};
+export {searchBook, trendingBooks};

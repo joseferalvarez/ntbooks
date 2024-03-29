@@ -11,7 +11,7 @@ export const zBook = z.object({
     publisher: z.optional(z.array(z.string())),
     language: z.optional(z.array(z.string())),
     isbn: z.optional(z.array(z.string())),
-    pages_number: z.optional(z.number()),
+    number_of_pages_median: z.optional(z.number()),
 });
 
 export type IBook = z.infer<typeof zBook>;
