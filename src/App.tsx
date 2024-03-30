@@ -30,7 +30,7 @@ export default function App() {
 
   const getBooks = async (text: string) => {
     const apiData = text ? await searchBook(text) : await trendingBooks();
-    setBooks(filterBooks(text ? apiData.docs : apiData.works));
+    setBooks(filterBooks(text ? apiData.docs : formatDailyBooks(apiData.works)));
   }
 
   const filterBooks = (books: IBook[]) => {
@@ -38,6 +38,13 @@ export default function App() {
       if(!book.cover_i) return;
       return book;
     })
+  }
+
+  const formatDailyBooks = (books) => {
+    return books.map((book) => {
+      if(!book.availability || !book?.availability.isbn) return book;
+      return {...book, isbn: [book.availability.isbn]};
+    });
   }
 
   const getBookData = (book: IBook) => {
@@ -51,8 +58,8 @@ export default function App() {
       edition_count: book.edition_count,
       publisher: book.publisher,
       language: book.language,
-      isbn: book.isbn,
-      number_of_pages_median: book.number_of_pages_median
+      isbn: (book.isbn && book.isbn.length > 3) ? book.isbn.slice(0,3) : book.isbn,
+      number_of_pages_median: book.number_of_pages_median,
     }
   }
 

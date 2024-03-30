@@ -11,9 +11,9 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@notionhq/client": "^2.2.14",
     "iconoir-react": "^7.5.0",
     "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.13",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zod": "^3.22.4"
