@@ -22,6 +22,9 @@ export default function Popup({
   const getBookData = async () => {
     const response = await fetch(`${import.meta.env.VITE_OPEN_LIBRARY_DETAIL}${currentBook.key}.json`);
     const data = await response.json();
+    console.log(data);
+    
+    if(!data.description) return '';
 
     if (data?.description.value) {
       setDescription(data.description.value);
@@ -52,13 +55,13 @@ export default function Popup({
               )}
             {currentBook.author_name && currentBook.author_name.length === 1 && currentBook.author_name[0]}
           </p>
-          {currentBook.publisher && <p className="pt-[10px] text-lg">{currentBook.publisher[0]}</p>}
+          {currentBook.publisher && <p className="pt-[10px] text-lg">{currentBook.publisher}</p>}
 
           <div className="flex flex-row gap-[10px] pt-[20px]">
             {currentBook.language && (
               <div className="flex w-fit items-center justify-center gap-[3px] rounded bg-orange-nt px-[5px] py-[5px]">
                 <Language height={20} />
-                <p className="book-data">{currentBook.language[0]}</p>
+                <p className="book-data">{currentBook.language}</p>
               </div>
             )}
 
@@ -82,7 +85,7 @@ export default function Popup({
           <div className="flex flex-row flex-wrap gap-[10px] pt-[20px]">
             {formatIsbn(currentBook.isbn) &&
               formatIsbn(currentBook.isbn).map((id) => (
-                <a className="text-xs py-[3px] px-[5px] bg-blue-nt rounded" href={`${import.meta.env.VITE_AMAZON_URL}/${id}`} target='_blank'>
+                <a key={id} className="text-xs py-[3px] px-[5px] bg-blue-nt rounded" href={`${import.meta.env.VITE_AMAZON_URL}/${id}`} target='_blank'>
                   {id}
                 </a>
               ))}

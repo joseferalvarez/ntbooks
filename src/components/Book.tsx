@@ -22,12 +22,12 @@ export default function Book({ book, setCurrentBook }: { book: IBook; setCurrent
             book.author_name.map((author, index) => (index < book.author_name.length - 1 ? `${author} & ` : author))}
           {book.author_name && book.author_name.length === 1 && book.author_name}
         </p>
-        {book.publisher && <p className="book-publisher">{book.publisher[0]}</p>}
+        {book.publisher && <p className="book-publisher">{book.publisher}</p>}
         <div className="flex flex-row flex-wrap gap-[10px] pt-[15px] ">
           {book.language && (
             <div className="flex w-fit items-center justify-center gap-[3px] rounded bg-orange-nt px-[5px] py-[5px]">
               <Language height={20} />
-              <p className="book-data">{book.language[0]}</p>
+              <p className="book-data">{book.language}</p>
             </div>
           )}
           {book.first_publish_year && (

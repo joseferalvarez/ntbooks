@@ -1,9 +1,6 @@
 import { IBook } from "../schemas/book";
 
 const saveNotionBook = async({book}: {book: IBook}) => {
-
-    //TODO: Filtrar autores (3 como maximo), publishers (solo 1)
-
     await fetch(import.meta.env.VITE_API_URL, {
       method: 'POST',
       body: JSON.stringify({

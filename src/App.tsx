@@ -1,87 +1,98 @@
-import { useEffect, useState } from "react"
-import { IBook } from "./schemas/book";
-import { searchBook, trendingBooks } from "./functions/searchBook";
-import Book from "./components/Book";
-import Search from "./components/Search";
-import Logo from "./components/Logo";
-import Popup from "./components/Popup";
+import { useEffect, useState } from 'react';
+import { IBook } from './schemas/book';
+import { searchBook, trendingBooks } from './functions/searchBook';
+import Book from './components/Book';
+import Search from './components/Search';
+import Logo from './components/Logo';
+import Popup from './components/Popup';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default function App() {
-
   const [books, setBooks] = useState<IBook[]>();
   const [search, setSearch] = useState<string>();
   const [currentBook, setCurrentBook] = useState<IBook | null>(null);
-  const [event, setEvent] = useState(null);
+
+  //TODO:Aqui puedo crear solo un estado que sea un objeto y se llame Controllers
+  const [event, setEvent] = useState(null); //Timeout state
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
   useEffect(() => {
-    if(event) clearTimeout(event);
-    
-    if(!search){
-      getBooks('');
+    if (event) clearTimeout(event);
+
+    if (!search) {
+      getBooks('', getResultsNumber(), false);
       return;
     }
-   
+
     const newEvent = setTimeout(() => {
-      getBooks(search);
+      getBooks(search, getResultsNumber(), false);
     }, 1500);
 
     setEvent(newEvent);
   }, [search]);
 
-  const getBooks = async (text: string) => {
-    const apiData = text ? await searchBook(text) : await trendingBooks();
-    setBooks(filterBooks(text ? apiData.docs : formatDailyBooks(apiData.works)));
-  }
+  const getBooks = async (text: string, results: number, next: boolean) => {
+    const apiData = text ? await searchBook(text, next ? page + 1 : 1, results) : await trendingBooks(next ? page + 1 : 1, results);
 
-  const filterBooks = (books: IBook[]) => {
-    return books.filter((book) => {
-      if(!book.cover_i) return;
-      return book;
-    })
-  }
-
-  const formatDailyBooks = (books) => {
-    return books.map((book) => {
-      if(!book.availability || !book?.availability.isbn) return book;
-      return {...book, isbn: [book.availability.isbn]};
-    });
-  }
-
-  const getBookData = (book: IBook) => {
-    return {
-      title: book.title,
-      key: book.key,
-      author_key: book.author_key,
-      author_name: book.author_name,
-      cover_i: book.cover_i,
-      first_publish_year: book.first_publish_year,
-      edition_count: book.edition_count,
-      publisher: book.publisher,
-      language: book.language,
-      isbn: (book.isbn && book.isbn.length > 3) ? book.isbn.slice(0,3) : book.isbn,
-      number_of_pages_median: book.number_of_pages_median,
+    if(!apiData || !apiData.length){
+      setHasMore(false);
     }
+    
+    if(next){
+      setBooks([...books, ...apiData]);
+      setPage(page+1);
+    }else{
+      setBooks(apiData);
+      setPage(1);
+    }
+  };
+
+  const getResultsNumber = () => {
+    const STANDAR_RESOLUTION: number = 1920;
+    const STANDAR_RESULTS: number = 21; //3 rows
+    const resolution: number = window.innerWidth;
+
+    return Math.round(((resolution * STANDAR_RESULTS) / STANDAR_RESOLUTION));
   }
 
   return (
-    <div className="bg-slate-50 min-h-[100vh]">
+    <div className="min-h-[100vh] bg-slate-50">
       <div className="flex flex-col">
-        <div className="px-[75px] py-[20px] w-[100%] flex bg-white shadow-md flex-row items-center justify-between fixed">
-          <div className="w-fit flex justify-center items-center h-[100%] gap-[10px]">
+        <div className="fixed flex w-[100%] flex-row items-center justify-between bg-white px-[75px] py-[20px] shadow-md">
+          <div
+            className="flex h-[100%] w-fit cursor-pointer items-center justify-center gap-[10px]"
+            onClick={() => setSearch('')}
+          >
             <Logo />
             <h1 className="text-3xl font-semibold">NTBooks</h1>
           </div>
-          <Search setSearch={setSearch} />
+          <Search
+            search={{
+              search: search,
+              setSearch: setSearch,
+            }}
+          />
         </div>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] auto-rows-auto gap-[15px] w-[100%] px-[75px] pt-[120px] pb-[40px]">
-          {books && books.length > 1 && books.map((book: IBook) => (<Book key={book.cover_i} book={getBookData(book)} setCurrentBook={setCurrentBook}/>))}
+        <div>
+          {books &&
+            books.length > 1 &&
+              <InfiniteScroll
+                className="grid w-[100%] auto-rows-auto grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-[15px] px-[75px] pb-[40px] pt-[120px]"
+                dataLength={books.length}
+                next={() => {
+                  getBooks(search ? search : '', getResultsNumber(), true);
+                }}
+                hasMore={hasMore}
+                loader={<p>Loading...</p>}
+                endMessage={<p>You have seen it all</p>}
+              >
+                {books.map((book: IBook, index) => <Book key={index} book={book} setCurrentBook={setCurrentBook} />)}
+              </InfiniteScroll>
+            }
         </div>
       </div>
-      {currentBook && 
-        <Popup 
-          currentBook={currentBook} 
-          setCurrentBook={setCurrentBook}
-        />}
+      {currentBook && <Popup currentBook={currentBook} setCurrentBook={setCurrentBook} />}
     </div>
-  )
+  );
 }
