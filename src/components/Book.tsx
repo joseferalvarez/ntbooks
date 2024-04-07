@@ -1,8 +1,8 @@
+import { getLanguageName } from '../functions/utils';
 import { IBook } from '../schemas/book';
 import { MultiplePages, Calendar, Language } from 'iconoir-react';
 
 export default function Book({ book, setCurrentBook }: { book: IBook; setCurrentBook: (book: IBook) => void }) {
-
   return (
     <div
       className="flex min-h-[450px] flex-col gap-[10px] rounded bg-white p-[15px] shadow-md"
@@ -12,6 +12,7 @@ export default function Book({ book, setCurrentBook }: { book: IBook; setCurrent
         <img
           className="h-[100%] w-[100%] object-contain"
           src={`${import.meta.env.VITE_OPEN_LIBRARY_COVERS_URL}/${book.cover_i}.jpg`}
+          alt="cover"
         />
       </div>
       <div className="flex grow flex-col gap-[5px]">
@@ -24,10 +25,10 @@ export default function Book({ book, setCurrentBook }: { book: IBook; setCurrent
         </p>
         {book.publisher && <p className="book-publisher">{book.publisher}</p>}
         <div className="flex flex-row flex-wrap gap-[10px] pt-[15px] ">
-          {book.language && (
+          {getLanguageName(book.language) && (
             <div className="flex w-fit items-center justify-center gap-[3px] rounded bg-orange-nt px-[5px] py-[5px]">
               <Language height={20} />
-              <p className="book-data">{book.language}</p>
+              <p className="book-data">{getLanguageName(book.language)}</p>
             </div>
           )}
           {book.first_publish_year && (

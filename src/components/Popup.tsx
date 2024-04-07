@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { IBook } from '../schemas/book';
 import { saveNotionBook } from '../functions/notionApi';
-import { Language } from 'iconoir-react';
-import { Calendar } from 'iconoir-react';
-import { MultiplePages } from 'iconoir-react';
+import { Language, Calendar, MultiplePages } from 'iconoir-react';
+import { getLanguageName } from '../functions/utils';
 
 export default function Popup({
   currentBook,
@@ -22,9 +21,8 @@ export default function Popup({
   const getBookData = async () => {
     const response = await fetch(`${import.meta.env.VITE_OPEN_LIBRARY_DETAIL}${currentBook.key}.json`);
     const data = await response.json();
-    console.log(data);
-    
-    if(!data.description) return '';
+
+    if (!data.description) return '';
 
     if (data?.description.value) {
       setDescription(data.description.value);
@@ -34,8 +32,9 @@ export default function Popup({
   };
 
   const formatIsbn = (isbns: string[]) => {
+    if (!isbns) return;
     return isbns.filter((isbn) => isbn.length === 10);
-  }
+  };
 
   return (
     <div className="fixed left-[0px] top-[0px] flex min-h-[100vh] w-[100%] items-center justify-center bg-grey-tr-nt">
@@ -44,6 +43,7 @@ export default function Popup({
         <img
           className="h-[80vh] w-[40%] object-contain"
           src={`${import.meta.env.VITE_OPEN_LIBRARY_COVERS_URL}/${currentBook.cover_i}.jpg`}
+          alt="cover"
         />
         <div className="flex grow flex-col justify-center">
           <h2 className="text-3xl font-semibold">{currentBook.title}</h2>
@@ -66,18 +66,18 @@ export default function Popup({
             )}
 
             {currentBook.first_publish_year && (
-            <div className="flex w-fit items-center gap-[3px] rounded bg-green-nt px-[5px] py-[5px]">
-              <Calendar height={20} />
-              <p className="book-data">{currentBook.first_publish_year}</p>
-            </div>
-          )}
+              <div className="flex w-fit items-center gap-[3px] rounded bg-green-nt px-[5px] py-[5px]">
+                <Calendar height={20} />
+                <p className="book-data">{currentBook.first_publish_year}</p>
+              </div>
+            )}
 
-          {currentBook.number_of_pages_median && (
-            <div className="flex w-fit items-center gap-[3px] rounded bg-red-nt px-[5px] py-[5px]">
-              <MultiplePages height={20} />
-              <p className="book-data">{currentBook.number_of_pages_median}</p>
-            </div>
-          )}
+            {currentBook.number_of_pages_median && (
+              <div className="flex w-fit items-center gap-[3px] rounded bg-red-nt px-[5px] py-[5px]">
+                <MultiplePages height={20} />
+                <p className="book-data">{currentBook.number_of_pages_median}</p>
+              </div>
+            )}
           </div>
 
           {description && <p className="mt-[25px] max-h-[350px] overflow-scroll text-base font-light">{description}</p>}
@@ -85,7 +85,13 @@ export default function Popup({
           <div className="flex flex-row flex-wrap gap-[10px] pt-[20px]">
             {formatIsbn(currentBook.isbn) &&
               formatIsbn(currentBook.isbn).map((id) => (
-                <a key={id} className="text-xs py-[3px] px-[5px] bg-blue-nt rounded" href={`${import.meta.env.VITE_AMAZON_URL}/${id}`} target='_blank'>
+                <a
+                  key={id}
+                  className="rounded bg-blue-nt px-[5px] py-[3px] text-xs"
+                  href={`${import.meta.env.VITE_AMAZON_URL}/${id}`}
+                  rel="noreferrer"
+                  target="_blank"
+                >
                   {id}
                 </a>
               ))}
@@ -95,7 +101,9 @@ export default function Popup({
             className="mt-[20px] w-fit cursor-pointer self-end rounded-lg bg-orange-nt px-[20px] py-[10px] text-lg"
             type="button"
             value="Guardar en notion"
-            onClick={() => saveNotionBook({book: currentBook})}
+            onClick={() =>
+              saveNotionBook({ book: { ...currentBook, language: getLanguageName(currentBook.language) } })
+            }
           />
         </div>
       </div>

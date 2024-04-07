@@ -33,16 +33,20 @@ export default function App() {
   }, [search]);
 
   const getBooks = async (text: string, results: number, next: boolean) => {
-    const apiData = text ? await searchBook(text, next ? page + 1 : 1, results) : await trendingBooks(next ? page + 1 : 1, results);
+    const apiData = text
+      ? await searchBook(text, next ? page + 1 : 1, results)
+      : await trendingBooks(next ? page + 1 : 1, results);
 
-    if(!apiData || !apiData.length){
+    if (!apiData || !apiData.length) {
       setHasMore(false);
+    } else {
+      setHasMore(true);
     }
-    
-    if(next){
+
+    if (next) {
       setBooks([...books, ...apiData]);
-      setPage(page+1);
-    }else{
+      setPage(page + 1);
+    } else {
       setBooks(apiData);
       setPage(1);
     }
@@ -53,20 +57,20 @@ export default function App() {
     const STANDAR_RESULTS: number = 21; //3 rows
     const resolution: number = window.innerWidth;
 
-    return Math.round(((resolution * STANDAR_RESULTS) / STANDAR_RESOLUTION));
-  }
+    return Math.round((resolution * STANDAR_RESULTS) / STANDAR_RESOLUTION);
+  };
 
   return (
     <div className="min-h-[100vh] bg-slate-50">
       <div className="flex flex-col">
-        <div className="fixed flex w-[100%] flex-row items-center justify-between bg-white px-[75px] py-[20px] shadow-md">
-          <div
+        <div className="z-2 fixed flex w-[100%] flex-row items-center justify-between bg-white px-[75px] py-[20px] shadow-md">
+          <button
             className="flex h-[100%] w-fit cursor-pointer items-center justify-center gap-[10px]"
             onClick={() => setSearch('')}
           >
             <Logo />
             <h1 className="text-3xl font-semibold">NTBooks</h1>
-          </div>
+          </button>
           <Search
             search={{
               search: search,
@@ -75,21 +79,30 @@ export default function App() {
           />
         </div>
         <div>
-          {books &&
-            books.length > 1 &&
-              <InfiniteScroll
-                className="grid w-[100%] auto-rows-auto grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-[15px] px-[75px] pb-[40px] pt-[120px]"
-                dataLength={books.length}
-                next={() => {
-                  getBooks(search ? search : '', getResultsNumber(), true);
-                }}
-                hasMore={hasMore}
-                loader={<p>Loading...</p>}
-                endMessage={<p>You have seen it all</p>}
-              >
-                {books.map((book: IBook, index) => <Book key={index} book={book} setCurrentBook={setCurrentBook} />)}
-              </InfiniteScroll>
-            }
+          {books && books.length > 1 && (
+            <InfiniteScroll
+              className="relative grid w-[100%] auto-rows-auto grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-[15px] px-[75px] pb-[40px] pt-[120px]"
+              dataLength={books.length}
+              next={() => {
+                getBooks(search ? search : '', getResultsNumber(), true);
+              }}
+              hasMore={hasMore}
+              loader={
+                <div className="absolute bottom-[10px] left-[50%] translate-x-[-50%]">
+                  <div className="loader"></div>
+                </div>
+              }
+              endMessage={
+                <div className="absolute bottom-[10px] left-[50%] translate-x-[-50%]">
+                  <p className="font-medium">No hay mas libros para mostrar</p>
+                </div>
+              }
+            >
+              {books.map((book: IBook, index) => (
+                <Book key={index} book={book} setCurrentBook={setCurrentBook} />
+              ))}
+            </InfiniteScroll>
+          )}
         </div>
       </div>
       {currentBook && <Popup currentBook={currentBook} setCurrentBook={setCurrentBook} />}

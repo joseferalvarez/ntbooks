@@ -1,6 +1,6 @@
 import { PageSearch } from 'iconoir-react';
 
-export default function Search({ search }: { search: {search: string, setSearch: (text: string) => void }}) {
+export default function Search({ search }: { search: { search: string; setSearch: (text: string) => void } }) {
   return (
     <form>
       <label className="flex w-fit items-center gap-[10px] rounded border-[1px] border-solid border-grey-nt p-[10px]">
